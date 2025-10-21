@@ -1,64 +1,59 @@
 import { useEffect, useState } from 'react'
 import './App.css'
-type EstudanteType = {
+import api from './api/api'
+type ProdutoType = {
   _id: string,
   nome: string,
-  idade: number
+  preco: number,
+  descricao: string,
+  urlfoto: string
 }
 function App() {
-  const token = localStorage.getItem("token")
   useEffect(() => {
-    fetch("/api/estudantes",{
-      headers: {
-      "Authorization": 'Bearer ${token}',
-    }
+    api.get("/produtos")
+    .then((response)=>setProdutos(response.data))
+    .catch((error) => {console.log(error);
+      alert("Error get data:"+(error?.response?.mensagem??error?.message))
     })
-    .then((response) => response.json())
-    .then((dados)=>setEstudantes(dados))
   }, [])
-  const [estudantes, setEstudantes] = useState<EstudanteType[]>([])
-  const [nome, setNome] = useState("")
-  const [idade, setIdade] = useState(0)
+  const [produtos, setProdutos] = useState<ProdutoType[]>([])
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    const estudante = {nome, idade}
-    fetch("/api/estudantes", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(estudante)
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    const formData = new FormData(event.currentTarget)
+      const nome = formData.get("nome")
+      const preco = formData.get("preco")
+      const descricao = formData.get("descricao")
+      const urlfoto = formData.get("urlfoto")
+    const produto = {nome, preco, descricao, urlfoto}
+    api.post("/produtos", produto)
+    .then((response) => setProdutos([...produtos, response.data]))
+    .catch((error) => {console.log(error);
+      alert("Error post data:"+(error?.response?.mensagem??error?.message))
     })
-    .then((response) => response.json())
-    .then((dados) => {
-      console.log(dados)
-      setEstudantes([...estudantes, dados])
-      setNome("")
-      setIdade(0)
-    })
-  }
+    }
  
   return (
     <>
-      <h1>Cadastro de Estudantes</h1>
+      <h1>Cadastro de Produtos</h1>
       <form onSubmit={handleSubmit}>
-        <input type="text" placeholder="Nome" value={nome}
-         onChange={(e) => setNome(e.target.value)}/>
-
-        <input type="number" placeholder="Idade" value={idade}
-         onChange={(e) => setIdade(Number(e.target.value))}/>
+        <input type="text" placeholder="Nome" name="nome"/>
+        <input type="number" placeholder="Preço" name="preco"/>
+        <input type="text" placeholder="Descrição" name="descricao"/>
+        <input type="text" placeholder="URL Foto" name="urlfoto"/>
 
         <input type="submit" value="Cadastrar"/>
       </form>
-      <h1>Lista de Estudantes</h1>
-      <div className="container-estudantes">
+      <h1>Lista de Produtos</h1>
+      <div className="container-produtos">
         {
-         estudantes.map((estudante) => {
+         produtos.map((produto) => {
            return (
-             <div key={estudante._id}>
-              <h2>{estudante.nome}</h2>
-              <p>Idade: {estudante.idade}</p>
+             <div key={produto._id}>
+              <h2>{produto.nome}</h2>
+              <img src={produto.urlfoto} alt="Imagem do produto" />
+              <p>Preço: {produto.preco}</p>
+              <p>Descrição: {produto.descricao}</p>
             </div>
            )
          })
