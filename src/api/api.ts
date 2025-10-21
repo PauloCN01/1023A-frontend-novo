@@ -21,9 +21,9 @@ api.interceptors.response.use(
     (response)=>response,
     (error)=>{
         const status = error?.response?.status;
-        if(status === 401&&!(error?.response?.config?.url.includes("/login"))){
+        if(status === 401&&!(error?.response?.config?.url.endsWith("/login"))){
             localStorage.removeItem("token");
-            window.location.href = "/login?mensagem=Token_expirado";
+            window.location.href = "/login?mensagem=Token_expirado!";
         }
         return Promise.reject(error);
     } 
