@@ -12,8 +12,16 @@ function App() {
   useEffect(() => {
     api.get("/produtos")
     .then((response)=>setProdutos(response.data))
-    .catch((error) => {console.log(error);
-      alert("Error get data:"+(error?.response?.mensagem??error?.message))
+    .catch((error) => {
+      if(error.response){
+      console.error("Servidor respondeu, mas com erro:"+(error.response.mensagem??error?.response.data))
+      alert("Servidor respondeu, mas com erro:"+(error.response.data.mensagem
+        ??" olhe o console do navegador para mais informações"))
+      }
+      else {//Não teve resposta do servidor, então mostramos o erro do axios
+        console.error("Error Axios:"+error.message)
+        alert("Servidor não respondeu, você ligou o backend? Erro do Axiios:"+(error.message??"Erro desconhecido: Chame o TERE"))
+      }
     })
   }, [])
   const [produtos, setProdutos] = useState<ProdutoType[]>([])
@@ -28,8 +36,16 @@ function App() {
     const produto = {nome, preco, descricao, urlfoto}
     api.post("/produtos", produto)
     .then((response) => setProdutos([...produtos, response.data]))
-    .catch((error) => {console.log(error);
-      alert("Error post data:"+(error?.response?.mensagem??error?.message))
+    .catch((error) => {
+      if(error.response){
+      console.error("Servidor respondeu, mas com erro:"+(error.response.mensagem??error?.response.data))
+      alert("Servidor respondeu, mas com erro:"+(error.response.data.mensagem
+        ??" olhe o console do navegador para mais informações"))
+      }
+      else {//Não teve resposta do servidor, então mostramos o erro do axios
+        console.error("Error Axios:"+error.message)
+        alert("Servidor não respondeu, você ligou o backend? Erro do Axiios:"+(error.message??"Erro desconhecido: Chame o TERE"))
+      }
     })
     }
  
