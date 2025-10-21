@@ -6,8 +6,13 @@ type EstudanteType = {
   idade: number
 }
 function App() {
+  const token = localStorage.getItem("token")
   useEffect(() => {
-    fetch("/api/estudantes")
+    fetch("/api/estudantes",{
+      headers: {
+      "Authorization": 'Bearer ${token}',
+    }
+    })
     .then((response) => response.json())
     .then((dados)=>setEstudantes(dados))
   }, [])
